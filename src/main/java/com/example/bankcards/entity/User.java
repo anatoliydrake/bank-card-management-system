@@ -2,16 +2,14 @@ package com.example.bankcards.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Getter
 @Setter
-@NoArgsConstructor
+@ToString(exclude = "password")
 @Entity
 @Table(name = "users")
 public class User {
@@ -20,23 +18,34 @@ public class User {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "user_name", nullable = false)
-    private String userName;
+    @Column(name = "username", nullable = false)
+    private String username;
 
     @Column(name = "password", nullable = false)
     private String password;
 
-    @ManyToMany
+    @Column(name = "passport_number", unique = true, nullable = false)
+    private String passportNumber;
+
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_roles",
             joinColumns = {@JoinColumn(name = "user_id")},
             inverseJoinColumns = {@JoinColumn(name = "role_id")})
     private Set<Role> roles = new HashSet<>();
 
-    @OneToMany (mappedBy = "holder")
-    private List<Card> cards;
+    @OneToMany(mappedBy = "holder")
+    private List<Card> cards = new ArrayList<>();
 
-    public User(String userName, String password) {
-        this.userName = userName;
-        this.password = password;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return Objects.equals(passportNumber, user.passportNumber);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(passportNumber);
     }
 }
