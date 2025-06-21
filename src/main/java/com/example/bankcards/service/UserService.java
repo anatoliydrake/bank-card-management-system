@@ -3,6 +3,8 @@ package com.example.bankcards.service;
 import com.example.bankcards.dto.UserDto;
 import com.example.bankcards.entity.Role;
 import com.example.bankcards.entity.User;
+import com.example.bankcards.exception.DuplicatePassportException;
+import com.example.bankcards.exception.UserNotFoundException;
 import com.example.bankcards.mapper.UserMapper;
 import com.example.bankcards.repository.RoleRepository;
 import com.example.bankcards.repository.UserRepository;
@@ -25,7 +27,7 @@ public class UserService {
 
     public UserDto getById(Long id) {
         log.info("Get user by id: " + id);
-        return userRepository.findById(id).map(userMapper::mapToDto).orElse(null);
+        return userRepository.findById(id).map(userMapper::mapToDto).orElseThrow(() -> new UserNotFoundException(id));
     }
 
     public List<UserDto> getAll() {
@@ -37,14 +39,15 @@ public class UserService {
 
     public UserDto create(UserDto userDto) {
         log.info("Create new User");
-        if (userRepository.findByPassportNumber(userDto.getPassportNumber()).isPresent()) {
-            return null;
+        String passportNumber = userDto.getPassportNumber();
+        if (userRepository.findByPassportNumber(passportNumber).isPresent()) {
+            throw new DuplicatePassportException(passportNumber);
         }
 
         User user = new User();
         user.setUsername(userDto.getUsername());
         user.setPassword(userDto.getPassword());
-        user.setPassportNumber(userDto.getPassportNumber());
+        user.setPassportNumber(passportNumber);
         Set<Role> userRoles = new HashSet<>(roleRepository.findByNameIn(userDto.getRoles()));
         user.setRoles(userRoles);
         user.setCards(new ArrayList<>());
@@ -53,10 +56,10 @@ public class UserService {
     }
 
     public UserDto update(UserDto userDto) {
-        User user = userRepository.findById(userDto.getId()).orElse(null);
-        if (user == null) {
-            return null;
-        }
+        Long id = userDto.getId();
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(id));
+
         if (userDto.getUsername() != null) {
             user.setUsername(userDto.getUsername());
         }
@@ -76,6 +79,10 @@ public class UserService {
     }
 
     public void deleteById(Long id) {
+        if (userRepository.findById(id).isEmpty()) {
+            throw new UserNotFoundException(id);
+        }
+
         userRepository.deleteById(id);
         log.info("User " + id + " deleted");
     }
