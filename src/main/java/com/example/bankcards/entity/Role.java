@@ -2,6 +2,7 @@ package com.example.bankcards.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.HashSet;
@@ -10,6 +11,7 @@ import java.util.Set;
 
 @Getter
 @Setter
+@NoArgsConstructor
 @Entity
 @Table(name = "roles")
 public class Role {
@@ -20,6 +22,10 @@ public class Role {
 
     @Column(unique = true, nullable = false)
     private String name;
+
+    public Role(String name) {
+        this.name = name;
+    }
 
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "user_roles",
