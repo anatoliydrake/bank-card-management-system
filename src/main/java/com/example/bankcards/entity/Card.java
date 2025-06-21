@@ -29,10 +29,10 @@ public class Card {
     private LocalDate expirationDate;
 
     @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "enum", name = "status", nullable = false)
+    @Column(name = "status", nullable = false)
     private CardStatus status;
 
-    @Column(name = "balance", nullable = false)
+    @Column(name = "balance", precision = 19, scale = 2, nullable = false)
     private BigDecimal balance;
 
     @Override

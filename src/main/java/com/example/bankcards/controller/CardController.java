@@ -7,8 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -18,7 +18,7 @@ public class CardController {
     private final CardService service;
 
     @GetMapping(path = "/{id}")
-    public ResponseEntity<?> getCardById(@PathVariable Long id) {
+    public ResponseEntity<?> getById(@PathVariable Long id) {
         CardDto cardDto = service.getById(id);
         if (cardDto == null) {
             Map<String, String> response = new HashMap<>();
@@ -29,22 +29,22 @@ public class CardController {
     }
 
     @GetMapping
-    public ResponseEntity<List<CardDto>> getAllCards() {
+    public ResponseEntity<Collection<CardDto>> getAll() {
         return ResponseEntity.ok(service.getAll());
     }
 
     @GetMapping(path = "/user/{id}")
-    public ResponseEntity<List<CardDto>> getUserCards(@PathVariable Long id) {
+    public ResponseEntity<Collection<CardDto>> getUserCards(@PathVariable Long id) {
         return ResponseEntity.ok(service.getCardsByHolderId(id));
     }
 
     @PostMapping(path = "/user/{id}")
-    public ResponseEntity<CardDto> createCard(@PathVariable Long id) {
+    public ResponseEntity<CardDto> create(@PathVariable Long id) {
         return new ResponseEntity<>(service.create(id), HttpStatus.CREATED);
     }
 
     @PutMapping(path = "/{id}")
-    public ResponseEntity<CardDto> updateCard(@PathVariable Long id, @RequestBody CardDto cardDto) {
+    public ResponseEntity<CardDto> update(@PathVariable Long id, @RequestBody CardDto cardDto) {
         cardDto.setId(id);
         service.update(cardDto);
         return ResponseEntity.ok(service.getById(id));
