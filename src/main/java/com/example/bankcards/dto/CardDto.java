@@ -10,6 +10,7 @@ import java.time.LocalDate;
 @Getter
 @Setter
 public class CardDto {
+    private Long id;
     private String number;
     private String holderName;
     private LocalDate expirationDate;

@@ -13,12 +13,12 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Collection;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class CardService implements CRUDService<CardDto>{
+public class CardService implements CRUDService<CardDto> {
     private final CardRepository cardRepository;
     private final UserRepository userRepository;
 
@@ -33,14 +33,14 @@ public class CardService implements CRUDService<CardDto>{
     }
 
     @Override
-    public Collection<CardDto> getAll() {
+    public List<CardDto> getAll() {
         log.info("Get all cards");
         return cardRepository.findAll().stream()
                 .map(CardService::mapToDto)
                 .toList();
     }
 
-    public Collection<CardDto> getCardsByHolderId(Long id) {
+    public List<CardDto> getCardsByHolderId(Long id) {
         log.info("Get all cards of user " + id);
         User user = userRepository.findById(id).orElse(null);
         if (user == null) {
@@ -90,10 +90,12 @@ public class CardService implements CRUDService<CardDto>{
     @Override
     public void deleteById(Long id) {
         cardRepository.deleteById(id);
+        log.info("Card " + id + " deleted");
     }
 
-    public static CardDto mapToDto (Card card) {
+    public static CardDto mapToDto(Card card) {
         CardDto cardDto = new CardDto();
+        cardDto.setId(card.getId());
         cardDto.setNumber(card.getNumber());
         cardDto.setHolderName(card.getHolder().getUsername());
         cardDto.setExpirationDate(card.getExpirationDate());
