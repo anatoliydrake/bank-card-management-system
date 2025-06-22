@@ -17,9 +17,12 @@ spring:
     show-sql: true
     hibernate.ddl-auto: none
   liquibase:
-    change-log: classpath:db/migration/changelog-master.yml
-    enabled: false
+    change-log: classpath:db/migration/db.changelog-master.yml
+    enabled: true
     drop-first: false
+
+jwt:
+  secret: ${JWT_SECRET}
 
 server:
   port: 8080
