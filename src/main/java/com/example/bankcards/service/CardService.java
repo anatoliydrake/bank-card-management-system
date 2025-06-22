@@ -4,7 +4,10 @@ import com.example.bankcards.dto.CardDto;
 import com.example.bankcards.dto.TransferDto;
 import com.example.bankcards.entity.Card;
 import com.example.bankcards.entity.CardStatus;
-import com.example.bankcards.entity.User;
+import com.example.bankcards.entity.User;import com.example.bankcards.exception.CardNotActiveException;
+import com.example.bankcards.exception.CardNotFoundException;
+import com.example.bankcards.exception.InsufficientFundsException;
+import com.example.bankcards.exception.UserNotFoundException;
 import com.example.bankcards.mapper.CardMapper;
 import com.example.bankcards.repository.CardRepository;
 import com.example.bankcards.repository.UserRepository;
@@ -28,12 +31,8 @@ public class CardService {
     private final CardMapper cardMapper;
 
     public CardDto getById(Long id) {
-        log.info("Get card by ID: " + id);
-        Card card = cardRepository.findById(id).orElse(null);
-        if (card == null) {
-            return null;
-        }
-        return cardMapper.mapToDto(card);
+        log.info("Get card by ID: {}", id);
+        return cardRepository.findById(id).map(cardMapper::mapToDto).orElseThrow(() -> new CardNotFoundException(id));
     }
 
     public Collection<CardDto> getAll() {
@@ -44,10 +43,9 @@ public class CardService {
     }
 
     public Collection<CardDto> getCardsByHolderId(Long id) {
-        log.info("Get all cards of user " + id);
-        User user = userRepository.findById(id).orElse(null);
-        if (user == null) {
-            return null;
+        log.info("Get all cards of user {}", id);
+        if (userRepository.findById(id).isEmpty()) {
+            throw new UserNotFoundException(id);
         }
         return cardRepository.findByHolderId(id).stream()
                 .map(cardMapper::mapToDto)
@@ -56,10 +54,7 @@ public class CardService {
 
     public CardDto create(Long id) {
         log.info("Create new card for User");
-        User user = userRepository.findById(id).orElse(null);
-        if (user == null) {
-            return null;
-        }
+        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
 
         String cardNumber;
         do {
@@ -78,50 +73,48 @@ public class CardService {
     }
 
     public CardDto changeCardStatus(Long cardId, CardStatus newStatus) {
-        Card card = cardRepository.findById(cardId).orElse(null);
-        if (card == null) {
-            return null;
+        Card card = cardRepository.findById(cardId).orElseThrow(() -> new CardNotFoundException(cardId));
+        if (card.getStatus().equals(newStatus)) {
+            return cardMapper.mapToDto(card);
         }
-        if (!card.getStatus().equals(newStatus)) {
-            card.setStatus(newStatus);
-        }
-        log.info("Card ID: " + card.getId() + " changed status to " + newStatus);
+        card.setStatus(newStatus);
+        log.info("Card ID: {} changed status to {}", card.getId(), newStatus);
         return cardMapper.mapToDto(cardRepository.save(card));
     }
 
     public void deleteById(Long id) {
+        if (cardRepository.findById(id).isEmpty()) {
+            throw new CardNotFoundException(id);
+        }
         cardRepository.deleteById(id);
-        log.info("Card ID: " + id + " deleted");
+        log.info("Card ID: {} deleted", id);
     }
 
     public BigDecimal getBalance(Long cardId) {
-        log.info("Get balance for card ID: " + cardId);
-        Card card = cardRepository.findById(cardId).orElse(null);
-        if (card == null) {
-            return null;
-        }
+        log.info("Get balance for card ID: {}", cardId);
+        Card card = cardRepository.findById(cardId).orElseThrow(() -> new CardNotFoundException(cardId));
         return card.getBalance();
     }
 
     @Transactional
-    public String transfer(TransferDto transferDto) {
-        Card fromCard = cardRepository.findByNumber(transferDto.getFromCardNumber()).orElse(null);
-        Card toCard = cardRepository.findByNumber(transferDto.getToCardNumber()).orElse(null);
+    public void transfer(TransferDto transferDto) {
+        String fromCardNumber = transferDto.getFromCardNumber();
+        Card fromCard = cardRepository.findByNumber(fromCardNumber)
+                .orElseThrow(() -> new CardNotFoundException(fromCardNumber));
 
-        if (fromCard == null || toCard == null) {
-            return "One or both cards not found";
-        }
+        String toCardNumber = transferDto.getToCardNumber();
+        Card toCard = cardRepository.findByNumber(toCardNumber)
+                .orElseThrow(() -> new CardNotFoundException(toCardNumber));
 
         if (fromCard.getStatus() != CardStatus.ACTIVE) {
-            return "Source card is not active";
+            throw new CardNotActiveException(fromCardNumber);
         }
-
         if (toCard.getStatus() != CardStatus.ACTIVE) {
-            return "Destination card is not active";
+            throw new CardNotActiveException(toCardNumber);
         }
 
         if (fromCard.getBalance().compareTo(transferDto.getAmount()) < 0) {
-            return "Insufficient funds";
+            throw new InsufficientFundsException(fromCardNumber);
         }
 
         fromCard.setBalance(fromCard.getBalance().subtract(transferDto.getAmount()));
@@ -131,7 +124,5 @@ public class CardService {
         cardRepository.save(toCard);
 
         log.info("Transferred {} from {} to {}", transferDto.getAmount(), fromCard.getNumber(), toCard.getNumber());
-
-        return "Transfer successful";
     }
 }

@@ -1,6 +1,7 @@
 package com.example.bankcards.service;
 
 import com.example.bankcards.dto.UserDto;
+import com.example.bankcards.dto.UserUpdateDto;
 import com.example.bankcards.entity.Role;
 import com.example.bankcards.entity.User;
 import com.example.bankcards.exception.DuplicatePassportException;
@@ -55,10 +56,9 @@ public class UserService {
         return userMapper.mapToDto(userRepository.save(user));
     }
 
-    public UserDto update(UserDto userDto) {
-        Long id = userDto.getId();
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException(id));
+    public UserDto update(Long userId, UserUpdateDto userDto) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId));
 
         if (userDto.getUsername() != null) {
             user.setUsername(userDto.getUsername());

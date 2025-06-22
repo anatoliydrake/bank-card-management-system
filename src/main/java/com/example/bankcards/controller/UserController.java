@@ -1,6 +1,7 @@
 package com.example.bankcards.controller;
 
 import com.example.bankcards.dto.UserDto;
+import com.example.bankcards.dto.UserUpdateDto;
 import com.example.bankcards.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,8 +19,7 @@ public class UserController {
 
     @GetMapping(path = "/{id}")
     public ResponseEntity<UserDto> getUserById(@PathVariable Long id) {
-        UserDto userDto = service.getById(id);
-        return ResponseEntity.ok(userDto);
+        return ResponseEntity.ok(service.getById(id));
     }
 
     @GetMapping
@@ -29,15 +29,12 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<UserDto> createUser(@Valid @RequestBody UserDto userDto) {
-        UserDto createdUser = service.create(userDto);
-        return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
+        return new ResponseEntity<>(service.create(userDto), HttpStatus.CREATED);
     }
 
-    @PutMapping(path = "/{id}")
-    public ResponseEntity<UserDto> updateUser(@PathVariable Long id, @RequestBody UserDto userDto) {
-        userDto.setId(id);
-        UserDto updatedUser = service.update(userDto);
-        return ResponseEntity.ok(updatedUser);
+    @PatchMapping(path = "/{id}")
+    public ResponseEntity<UserDto> updateUser(@PathVariable Long id, @Valid @RequestBody UserUpdateDto userDto) {
+        return ResponseEntity.ok(service.update(id, userDto));
     }
 
     @DeleteMapping(path = "/{id}")
