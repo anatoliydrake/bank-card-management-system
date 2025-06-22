@@ -2,7 +2,6 @@ package com.example.bankcards.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,12 +21,8 @@ public class UserDto {
     private String username;
 
     @NotBlank(message = "Password must not be blank")
-    @Size(min = 8, message = "Password must be at least 8 characters")
+    @Size(min = 4, message = "Password must be at least 4 characters")
     private String password;
-
-    @NotBlank(message = "Passport number must not be blank")
-    @Pattern(regexp = "\\d{10}", message = "Passport number must be 10 digits")
-    private String passportNumber;
 
     @NotEmpty(message = "User must have at least one role")
     private Set<String> roles;

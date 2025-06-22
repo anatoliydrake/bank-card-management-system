@@ -23,8 +23,8 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", e.getMessage()));
     }
 
-    @ExceptionHandler(DuplicatePassportException.class)
-    public ResponseEntity<?> handleDuplicatePassport(DuplicatePassportException e) {
+    @ExceptionHandler(DuplicateUsernameException.class)
+    public ResponseEntity<?> handleDuplicatePassport(DuplicateUsernameException e) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message", e.getMessage()));
     }
 

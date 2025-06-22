@@ -22,7 +22,6 @@ public class UserMapper {
         userDto.setId(user.getId());
         userDto.setUsername(user.getUsername());
         userDto.setPassword(user.getPassword());
-        userDto.setPassportNumber(user.getPassportNumber());
         userDto.setRoles(user.getRoles().stream().map(Role::getName).collect(Collectors.toSet()));
         userDto.setCards(user.getCards().stream().map(cardMapper::mapToDto).toList());
         return userDto;
