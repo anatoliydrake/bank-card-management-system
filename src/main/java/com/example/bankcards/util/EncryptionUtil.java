@@ -1,5 +1,6 @@
 package com.example.bankcards.util;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -9,6 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 @Component
+@Slf4j
 public class EncryptionUtil {
 
     @Value("${encryption.secret}")
@@ -26,6 +28,7 @@ public class EncryptionUtil {
             cipher.init(Cipher.ENCRYPT_MODE, getKey());
             return Base64.getEncoder().encodeToString(cipher.doFinal(data.getBytes(StandardCharsets.UTF_8)));
         } catch (Exception e) {
+            log.error("Encryption failed: {}", e.getMessage());
             throw new RuntimeException("Encryption failed", e);
         }
     }
@@ -36,6 +39,7 @@ public class EncryptionUtil {
             cipher.init(Cipher.DECRYPT_MODE, getKey());
             return new String(cipher.doFinal(Base64.getDecoder().decode(encrypted)));
         } catch (Exception e) {
+            log.error("Decryption failed: {}", e.getMessage());
             throw new RuntimeException("Decryption failed", e);
         }
     }

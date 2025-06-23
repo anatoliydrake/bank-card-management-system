@@ -41,6 +41,8 @@ services:
       ENCRYPTION_SECRET: ${ENCRYPTION_SECRET}
     networks:
       - bank-network
+    volumes:
+      - ./logs:/app/logs
 
 volumes:
   postgres-data:

@@ -30,12 +30,17 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     public UserDto getById(Long id) {
-        log.info("Get user by id: " + id);
-        return userRepository.findById(id).map(userMapper::mapToDto).orElseThrow(() -> new UserNotFoundException(id));
+        log.info("Retrieving user by ID: {}", id);
+        return userRepository.findById(id)
+                .map(userMapper::mapToDto)
+                .orElseThrow(() -> {
+                    log.warn("User ID {} not found", id);
+                    return new UserNotFoundException(id);
+                });
     }
 
     public List<UserDto> getAll() {
-        log.info("Get all users");
+        log.info("Retrieving all users");
         return userRepository.findAll().stream()
                 .map(userMapper::mapToDto)
                 .toList();
@@ -43,9 +48,10 @@ public class UserService {
 
     @Transactional
     public UserDto create(UserDto userDto) {
-        log.info("Create new User");
         String username = userDto.getUsername();
+        log.info("Creating new user '{}'", username);
         if (userRepository.findByUsername(username).isPresent()) {
+            log.warn("User '{}' already exists", username);
             throw new DuplicateUsernameException(username);
         }
 
@@ -56,13 +62,19 @@ public class UserService {
         user.setRoles(userRoles);
         user.setCards(new ArrayList<>());
 
-        return userMapper.mapToDto(userRepository.save(user));
+        User saved = userRepository.save(user);
+        log.info("User created successfully with ID {}", saved.getId());
+        return userMapper.mapToDto(saved);
     }
 
     @Transactional
     public UserDto update(Long userId, UserUpdateDto userDto) {
+        log.info("Updating user ID {}", userId);
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException(userId));
+                .orElseThrow(() -> {
+                    log.warn("User ID {} not found", userId);
+                    return new UserNotFoundException(userId);
+                });
 
         if (userDto.getUsername() != null) {
             user.setUsername(userDto.getUsername());
@@ -75,17 +87,19 @@ public class UserService {
             user.setRoles(userRoles);
         }
         user = userRepository.save(user);
-        log.info("User " + user.getId() + " updated");
+        log.info("User ID {} successfully updated", userId);
         return userMapper.mapToDto(user);
     }
 
     @Transactional
     public void deleteById(Long id) {
+        log.info("Deleting user ID {}", id);
         if (userRepository.findById(id).isEmpty()) {
+            log.warn("User ID {} not found", id);
             throw new UserNotFoundException(id);
         }
 
         userRepository.deleteById(id);
-        log.info("User " + id + " deleted");
+        log.info("User ID {} deleted successfully", id);
     }
 }
