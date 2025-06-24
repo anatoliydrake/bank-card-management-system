@@ -262,10 +262,7 @@ public class CardController {
                             example = "{\"error\": \"You can transfer only between your own cards.\"}"))),
             @ApiResponse(responseCode = "400", description = "Bad Request",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(example = "{\"message\": \"Card with ID: 10 is not active.\"}"))),
-            @ApiResponse(responseCode = "400", description = "Bad Request",
-                    content = @Content(mediaType = "application/json", schema = @Schema(
-                            example = "{\"message\": \"Card ID: 10 has insufficient funds for the operation\"}")))
+                            schema = @Schema(example = "{\"message\": \"Bad Request - card not active or insufficient funds\"}")))
     })
     @PreAuthorize("hasRole('USER')")
     @PostMapping("/transfer")
