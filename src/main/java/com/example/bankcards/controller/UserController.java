@@ -37,7 +37,10 @@ public class UserController {
                             schema = @Schema(implementation = CardDto.class))),
             @ApiResponse(responseCode = "404", description = "Not Found",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(example = "{\"message\": \"User with ID: 10 not found\"}")))
+                            schema = @Schema(example = "{\"message\": \"User with ID: 10 not found\"}"))),
+            @ApiResponse(responseCode = "403", description = "Forbidden",
+    content = @Content(mediaType = "application/json",
+        schema = @Schema(example = "{\"message\": \"Access Denied\"}")))
     })
     @GetMapping(path = "/{id}")
     public ResponseEntity<UserDto> getUserById(@PathVariable Long id, Authentication authentication) {
@@ -47,46 +50,51 @@ public class UserController {
 
     @Operation(summary = "Get all users", description = "List of all users",
             security = @SecurityRequirement(name = "bearerAuth"))
-    @ApiResponse(responseCode = "200", description = "OK", content = @Content(
-            mediaType = "application/json",
-            examples = @io.swagger.v3.oas.annotations.media.ExampleObject(
-                    value = """
-                        [
-                          {
-                            "id": 1,
-                            "username": "admin",
-                            "password": "<admin_encrypted_password>",
-                            "roles": ["ADMIN"],
-                            "cards": []
-                          },
-                          {
-                            "id": 2,
-                            "username": "user",
-                            "password": "<user_encrypted_password>",
-                            "roles": ["USER"],
-                            "cards": [
-                              {
-                                "id": 2,
-                                "number": "**** **** **** 5013",
-                                "holderName": "user",
-                                "expirationDate": "2030-06-22",
-                                "status": "BLOCKED",
-                                "balance": 42000.00
-                              },
-                              {
-                                "id": 4,
-                                "number": "**** **** **** 3201",
-                                "holderName": "user",
-                                "expirationDate": "2030-06-23",
-                                "status": "ACTIVE",
-                                "balance": 37000.00
-                              }
-                            ]
-                          }
-                        ]
-                        """
-            )
-    ))
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK", content = @Content(
+                    mediaType = "application/json",
+                    examples = @io.swagger.v3.oas.annotations.media.ExampleObject(
+                            value = """
+                                    [
+                                      {
+                                        "id": 1,
+                                        "username": "admin",
+                                        "password": "<admin_encrypted_password>",
+                                        "roles": ["ADMIN"],
+                                        "cards": []
+                                      },
+                                      {
+                                        "id": 2,
+                                        "username": "user",
+                                        "password": "<user_encrypted_password>",
+                                        "roles": ["USER"],
+                                        "cards": [
+                                          {
+                                            "id": 2,
+                                            "number": "**** **** **** 5013",
+                                            "holderName": "user",
+                                            "expirationDate": "2030-06-22",
+                                            "status": "BLOCKED",
+                                            "balance": 42000.00
+                                          },
+                                          {
+                                            "id": 4,
+                                            "number": "**** **** **** 3201",
+                                            "holderName": "user",
+                                            "expirationDate": "2030-06-23",
+                                            "status": "ACTIVE",
+                                            "balance": 37000.00
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                    """
+                    )
+            )),
+            @ApiResponse(responseCode = "403", description = "Forbidden",
+    content = @Content(mediaType = "application/json",
+        schema = @Schema(example = "{\"message\": \"Access Denied\"}")))
+    })
     @GetMapping
     public ResponseEntity<Collection<UserDto>> getAllUsers(Authentication authentication) {
         log.info("User '{}' requested all users", authentication.getName());
@@ -101,7 +109,10 @@ public class UserController {
                             schema = @Schema(implementation = UserDto.class))),
             @ApiResponse(responseCode = "409", description = "Conflict",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(example = "{\"message\": \"Username 'username' already exists\"}")))
+                            schema = @Schema(example = "{\"message\": \"Username 'username' already exists\"}"))),
+            @ApiResponse(responseCode = "403", description = "Forbidden",
+    content = @Content(mediaType = "application/json",
+        schema = @Schema(example = "{\"message\": \"Access Denied\"}")))
     })
     @PostMapping
     public ResponseEntity<UserDto> createUser(@Valid @io.swagger.v3.oas.annotations.parameters.RequestBody(
@@ -109,13 +120,13 @@ public class UserController {
             content = @Content(mediaType = "application/json",
                     examples = {@io.swagger.v3.oas.annotations.media.ExampleObject(
                             value = """
-                                                                              {
-                                                                                "username": "<username>",
-                                                                                "password": "<password>",
-                                                                                "roles": [
-                                                                                  "USER"
-                                                                                ]
-                                                                              }"""
+                                    {
+                                      "username": "<username>",
+                                      "password": "<password>",
+                                      "roles": [
+                                        "USER"
+                                      ]
+                                    }"""
                     )
                     })) @RequestBody UserDto userDto, Authentication authentication) {
         log.info("User '{}' requested creating of new user", authentication.getName());
@@ -130,7 +141,10 @@ public class UserController {
                             schema = @Schema(implementation = UserDto.class))),
             @ApiResponse(responseCode = "404", description = "Not Found",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(example = "{\"message\": \"User with ID: 10 not found\"}")))
+                            schema = @Schema(example = "{\"message\": \"User with ID: 10 not found\"}"))),
+            @ApiResponse(responseCode = "403", description = "Forbidden",
+    content = @Content(mediaType = "application/json",
+        schema = @Schema(example = "{\"message\": \"Access Denied\"}")))
     })
     @PatchMapping(path = "/{id}")
     public ResponseEntity<UserDto> updateUser(@PathVariable Long id,
@@ -140,7 +154,7 @@ public class UserController {
                                                               examples = {@io.swagger.v3.oas.annotations.media.ExampleObject(
                                                                       value = """
                                                                               {
-                                                                                "username": "<username>",
+                                                                                "username": "username",
                                                                                 "password": "<password>",
                                                                                 "roles": [
                                                                                   "USER"
@@ -159,7 +173,10 @@ public class UserController {
             @ApiResponse(responseCode = "204", description = "No Content"),
             @ApiResponse(responseCode = "404", description = "Not Found",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(example = "{\"message\": \"User with ID: 10 not found\"}")))
+                            schema = @Schema(example = "{\"message\": \"User with ID: 10 not found\"}"))),
+            @ApiResponse(responseCode = "403", description = "Forbidden",
+    content = @Content(mediaType = "application/json",
+        schema = @Schema(example = "{\"message\": \"Access Denied\"}")))
     })
     @DeleteMapping(path = "/{id}")
     public ResponseEntity<?> deleteById(@PathVariable Long id, Authentication authentication) {

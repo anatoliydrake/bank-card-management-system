@@ -41,7 +41,10 @@ public class CardController {
                             schema = @Schema(implementation = CardDto.class))),
             @ApiResponse(responseCode = "404", description = "Not Found",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(example = "{\"message\": \"Card with ID: 10 not found\"}")))
+                            schema = @Schema(example = "{\"message\": \"Card with ID: 10 not found\"}"))),
+            @ApiResponse(responseCode = "403", description = "Forbidden",
+    content = @Content(mediaType = "application/json",
+        schema = @Schema(example = "{\"message\": \"Access Denied\"}")))
     })
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping(path = "/{id}")
@@ -52,32 +55,37 @@ public class CardController {
 
     @Operation(summary = "Get all cards", description = "List of all cards",
             security = @SecurityRequirement(name = "bearerAuth"))
-    @ApiResponse(responseCode = "200", description = "OK",
-            content = @Content(mediaType = "application/json", examples = {
-                    @io.swagger.v3.oas.annotations.media.ExampleObject(
-                            value = """
-                                    [
-                                      {
-                                          "id": 1,
-                                          "number": "**** **** **** 5013",
-                                          "holderName": "username",
-                                          "expirationDate": "2030-06-22",
-                                          "status": "BLOCKED",
-                                          "balance": 42000.00
-                                      },
-                                      {
-                                          "id": 2,
-                                          "number": "**** **** **** 3201",
-                                          "holderName": "username",
-                                          "expirationDate": "2030-06-23",
-                                          "status": "ACTIVE",
-                                          "balance": 37000.00
-                                      }
-                                    ]
-                                    """
-                    )
-            }, array = @ArraySchema(schema = @Schema(implementation = CardDto.class)
-            )))
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @io.swagger.v3.oas.annotations.media.ExampleObject(
+                                    value = """
+                                            [
+                                              {
+                                                  "id": 1,
+                                                  "number": "**** **** **** 5013",
+                                                  "holderName": "username",
+                                                  "expirationDate": "2030-06-22",
+                                                  "status": "BLOCKED",
+                                                  "balance": 42000.00
+                                              },
+                                              {
+                                                  "id": 2,
+                                                  "number": "**** **** **** 3201",
+                                                  "holderName": "username",
+                                                  "expirationDate": "2030-06-23",
+                                                  "status": "ACTIVE",
+                                                  "balance": 37000.00
+                                              }
+                                            ]
+                                            """
+                            )
+                    }, array = @ArraySchema(schema = @Schema(implementation = CardDto.class)
+                    ))),
+            @ApiResponse(responseCode = "403", description = "Forbidden",
+    content = @Content(mediaType = "application/json",
+        schema = @Schema(example = "{\"message\": \"Access Denied\"}")))
+    })
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public ResponseEntity<Collection<CardDto>> getAll(Authentication authentication) {
@@ -93,7 +101,10 @@ public class CardController {
                             schema = @Schema(implementation = CardDto.class))),
             @ApiResponse(responseCode = "404", description = "Not Found",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(example = "{\"message\": \"User with ID 10 not found\"}")))
+                            schema = @Schema(example = "{\"message\": \"User with ID 10 not found\"}"))),
+            @ApiResponse(responseCode = "403", description = "Forbidden",
+    content = @Content(mediaType = "application/json",
+        schema = @Schema(example = "{\"message\": \"Access Denied\"}")))
     })
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping(path = "/user/{id}")
@@ -118,7 +129,10 @@ public class CardController {
                                       }"""))),
             @ApiResponse(responseCode = "404", description = "Not Found",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(example = "{\"message\": \"Card with ID: 10 not found\"}")))
+                            schema = @Schema(example = "{\"message\": \"Card with ID: 10 not found\"}"))),
+            @ApiResponse(responseCode = "403", description = "Forbidden",
+    content = @Content(mediaType = "application/json",
+        schema = @Schema(example = "{\"message\": \"Access Denied\"}")))
     })
     @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping(path = "/{id}/block")
@@ -143,7 +157,10 @@ public class CardController {
                                       }"""))),
             @ApiResponse(responseCode = "404", description = "Not Found",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(example = "{\"message\": \"Card with ID: 10 not found\"}")))
+                            schema = @Schema(example = "{\"message\": \"Card with ID: 10 not found\"}"))),
+            @ApiResponse(responseCode = "403", description = "Forbidden",
+    content = @Content(mediaType = "application/json",
+        schema = @Schema(example = "{\"message\": \"Access Denied\"}")))
     })
     @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping(path = "/{id}/activate")
@@ -158,7 +175,10 @@ public class CardController {
             @ApiResponse(responseCode = "204", description = "No Content"),
             @ApiResponse(responseCode = "404", description = "Not Found",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(example = "{\"message\": \"Card with ID: 10 not found\"}")))
+                            schema = @Schema(example = "{\"message\": \"Card with ID: 10 not found\"}"))),
+            @ApiResponse(responseCode = "403", description = "Forbidden",
+    content = @Content(mediaType = "application/json",
+        schema = @Schema(example = "{\"message\": \"Access Denied\"}")))
     })
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping(path = "/{id}")
@@ -170,59 +190,64 @@ public class CardController {
 
     @Operation(summary = "Get own cards", description = "Get current user's cards",
             security = @SecurityRequirement(name = "bearerAuth"))
-    @ApiResponse(responseCode = "200", description = "OK",
-            content = @Content(mediaType = "application/json", examples = {
-                    @io.swagger.v3.oas.annotations.media.ExampleObject(
-                            value = """
-                                    {
-                                        "content": [
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @io.swagger.v3.oas.annotations.media.ExampleObject(
+                                    value = """
                                             {
-                                                "id": 2,
-                                                "number": "**** **** **** 5013",
-                                                "holderName": "user",
-                                                "expirationDate": "2030-06-22",
-                                                "status": "BLOCKED",
-                                                "balance": 42000.00
-                                            },
-                                            {
-                                                "id": 4,
-                                                "number": "**** **** **** 3201",
-                                                "holderName": "user",
-                                                "expirationDate": "2030-06-23",
-                                                "status": "ACTIVE",
-                                                "balance": 37000.00
+                                                "content": [
+                                                    {
+                                                        "id": 2,
+                                                        "number": "**** **** **** 5013",
+                                                        "holderName": "user",
+                                                        "expirationDate": "2030-06-22",
+                                                        "status": "BLOCKED",
+                                                        "balance": 42000.00
+                                                    },
+                                                    {
+                                                        "id": 4,
+                                                        "number": "**** **** **** 3201",
+                                                        "holderName": "user",
+                                                        "expirationDate": "2030-06-23",
+                                                        "status": "ACTIVE",
+                                                        "balance": 37000.00
+                                                    }
+                                                ],
+                                                "pageable": {
+                                                    "pageNumber": 0,
+                                                    "pageSize": 2,
+                                                    "sort": {
+                                                        "empty": true,
+                                                        "sorted": false,
+                                                        "unsorted": true
+                                                    },
+                                                    "offset": 0,
+                                                    "paged": true,
+                                                    "unpaged": false
+                                                },
+                                                "totalPages": 3,
+                                                "totalElements": 6,
+                                                "last": false,
+                                                "size": 2,
+                                                "number": 0,
+                                                "sort": {
+                                                    "empty": true,
+                                                    "sorted": false,
+                                                    "unsorted": true
+                                                },
+                                                "numberOfElements": 2,
+                                                "first": true,
+                                                "empty": false
                                             }
-                                        ],
-                                        "pageable": {
-                                            "pageNumber": 0,
-                                            "pageSize": 2,
-                                            "sort": {
-                                                "empty": true,
-                                                "sorted": false,
-                                                "unsorted": true
-                                            },
-                                            "offset": 0,
-                                            "paged": true,
-                                            "unpaged": false
-                                        },
-                                        "totalPages": 3,
-                                        "totalElements": 6,
-                                        "last": false,
-                                        "size": 2,
-                                        "number": 0,
-                                        "sort": {
-                                            "empty": true,
-                                            "sorted": false,
-                                            "unsorted": true
-                                        },
-                                        "numberOfElements": 2,
-                                        "first": true,
-                                        "empty": false
-                                    }
-                                    """
-                    )
-            }, array = @ArraySchema(schema = @Schema(implementation = CardDto.class)
-            )))
+                                            """
+                            )
+                    }, array = @ArraySchema(schema = @Schema(implementation = CardDto.class)
+                    ))),
+            @ApiResponse(responseCode = "403", description = "Forbidden",
+    content = @Content(mediaType = "application/json",
+        schema = @Schema(example = "{\"message\": \"Access Denied\"}")))
+    })
     @PreAuthorize("hasRole('USER')")
     @GetMapping("/my")
     public ResponseEntity<Page<CardDto>> getMyCards(
@@ -238,9 +263,14 @@ public class CardController {
 
     @Operation(summary = "Get total balance", description = "Returns total balance of user's cards",
             security = @SecurityRequirement(name = "bearerAuth"))
-    @ApiResponse(responseCode = "200", description = "OK",
-            content = @Content(mediaType = "application/json",
-                    schema = @Schema(example = "{\"balance\": \"304000.00\"}")))
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(example = "{\"balance\": \"304000.00\"}"))),
+            @ApiResponse(responseCode = "403", description = "Forbidden",
+    content = @Content(mediaType = "application/json",
+        schema = @Schema(example = "{\"message\": \"Access Denied\"}")))
+    })
     @PreAuthorize("hasRole('USER')")
     @GetMapping("/balance")
     public ResponseEntity<?> getBalance(Authentication authentication) {
@@ -262,7 +292,11 @@ public class CardController {
                             example = "{\"error\": \"You can transfer only between your own cards.\"}"))),
             @ApiResponse(responseCode = "400", description = "Bad Request",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(example = "{\"message\": \"Bad Request - card not active or insufficient funds\"}")))
+                            schema = @Schema(example = "{\"message\": " +
+                                    "\"Bad Request - card not active or insufficient funds\"}"))),
+            @ApiResponse(responseCode = "403", description = "Forbidden",
+    content = @Content(mediaType = "application/json",
+        schema = @Schema(example = "{\"message\": \"Access Denied\"}")))
     })
     @PreAuthorize("hasRole('USER')")
     @PostMapping("/transfer")
@@ -282,9 +316,13 @@ public class CardController {
             @ApiResponse(responseCode = "404", description = "Not Found",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(example = "{\"message\": \"Card with ID: 10 not found\"}"))),
-            @ApiResponse(responseCode = "403", description = "Bad Request",
+            @ApiResponse(responseCode = "400", description = "Bad Request",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(example = "{\"error\": \"Only active cards can be blocked.\"}")))
+                            schema = @Schema(example = "{\"message\": " +
+                                    "\"Bad Request - card not active or user does not own the card\"}"))),
+            @ApiResponse(responseCode = "403", description = "Forbidden",
+    content = @Content(mediaType = "application/json",
+        schema = @Schema(example = "{\"message\": \"Access Denied\"}")))
     })
     @PreAuthorize("hasRole('USER')")
     @PatchMapping("/{id}/request-block")
