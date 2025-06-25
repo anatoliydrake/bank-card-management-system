@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - include:
+      file: db/migration/V01__create_tables.yml
+  - include:
+      file: db/migration/V02__insert_roles.yml
+  - include:
+      file: db/migration/V03__insert_test_admin_and_user.yml

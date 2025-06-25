@@ -1,0 +1,59 @@
+databaseChangeLog:
+  - changeSet:
+      id: insert-test-users
+      author: dev
+      changes:
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 1
+              - column:
+                  name: username
+                  value: admin
+              - column:
+                  name: password
+                  value: $2a$10$28KDEtKF0olXiMEvs4d2UOgs99kWGBHZcW49csLZMxixoxnTE6C5K
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 2
+              - column:
+                  name: username
+                  value: user
+              - column:
+                  name: password
+                  value: $2a$10$L5RsHhlrhECWfOCWaRNCKeYRfDj.XTaiPkCmJHOI6yh5lAb4kWyJW
+
+  - changeSet:
+      id: assign-roles
+      author: dev
+      changes:
+        - insert:
+            tableName: user_roles
+            columns:
+              - column:
+                  name: user_id
+                  valueNumeric: 1
+              - column:
+                  name: role_id
+                  valueNumeric: 1
+        - insert:
+            tableName: user_roles
+            columns:
+              - column:
+                  name: user_id
+                  valueNumeric: 2
+              - column:
+                  name: role_id
+                  valueNumeric: 2
+  - changeSet:
+      id: update-user-id-sequence
+      author: dev
+      changes:
+        - sql:
+            splitStatements: false
+            sql: SELECT setval('users_id_seq', (SELECT MAX(id) FROM users));
